@@ -26,16 +26,23 @@ public class AlbumBean {
 		Connection conn = DatabaseInfo.getConnection();
 
 		Album a;
-		String query = "SELECT AlbumTitle, b.BandName, AlbumYear, AlbumNumber FROM (Albums AS a JOIN Bands AS b ON a.BandID = b.BandID) WHERE AlbumTitle = ?";
+		String query = "SELECT AlbumTitle, b.BandName, AlbumYear, AlbumNumber, AlbumID FROM (Albums AS a JOIN Bands AS b ON a.BandID = b.BandID) WHERE AlbumTitle = ?";
 		try{
 			PreparedStatement ps = conn.prepareStatement(query);
 			ps.setString(1, albumTitle);
 			ResultSet rs = ps.executeQuery();
 		
 			BandBean b = new BandBean();
-	
-			a = new Album(rs.getString("AlbumTitle"), Integer.parseInt(rs.getString("AlbumYear")), b.getBand(rs.getString("b.BandName")), Integer.parseInt(rs.getString("AlbumNumber")),Integer.parseInt(rs.getString("AlbumId")) );
+			a = new Album();
+			if(rs.next()) {
+				a.setTitle(rs.getString("AlbumTitle"));
+				a.setYear(Integer.parseInt(rs.getString("AlbumYear")));
+				a.setBand(b.getBand(rs.getString("b.BandName")));
+				a.setAlbumNumber(Integer.parseInt(rs.getString("AlbumNumber")));
+				a.setAlbumId(Integer.parseInt(rs.getString("AlbumId")));
 
+			}
+			
 			rs.next();
 			conn.close();
 
@@ -70,9 +77,9 @@ public class AlbumBean {
 				String query2 = "SELECT SongTitle FROM (Songs AS s JOIN AlbumSongs AS a ON s.SongID = a.SongID) WHERE a.AlbumID = ?";
 				ps = conn.prepareStatement(query2);
 				ps.setInt(1, albumID);
-				rs = ps.executeQuery();
-				while(rs.next()) {
-					songs.add(rs.getString("SongTitle"));
+				ResultSet rs2 = ps.executeQuery();
+				while(rs2.next()) {
+					songs.add(rs2.getString("SongTitle"));
 				}
 				a.setSongTitles(songs);
 				albumList.add(a);
@@ -100,6 +107,7 @@ public class AlbumBean {
 		AlbumBean ab = new AlbumBean();
 		for(Album a : ab.getAlbums()) {
 			System.out.println("\t"+a.getTitle()+" (id = "+a.getAlbumId()+")");
+			
 		}
 
 		Album da = null; 

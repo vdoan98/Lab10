@@ -12,6 +12,11 @@ public class Album {
 	private Integer albumNumber;
 	private List<String> songTitles = new ArrayList<String>();
 	
+	public Album()
+	{
+		
+	}
+	
 	
 	public Album(String title, Integer year, Band band, Integer albumNumber, Integer albumId) {
 		this.title = title;
